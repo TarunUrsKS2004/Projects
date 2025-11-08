@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🌊 Smart Water Quality Prediction</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(to right, #e0f7fa, #b3e5fc);
+      text-align: center;
+      padding: 50px;
+      margin: 0;
+    }
+    header {
+      margin-bottom: 30px;
+    }
+    header h1 {
+      font-size: 2.2em;
+      color: #01579b;
+      margin: 10px 0;
+    }
+    header img {
+      width: 70px;
+      vertical-align: middle;
+    }
+    form {
+      background: #fff;
+      padding: 30px 40px;
+      border-radius: 16px;
+      box-shadow: 0px 6px 14px rgba(0,0,0,0.15);
+      display: inline-block;
+      transition: transform 0.2s;
+    }
+    form:hover {
+      transform: scale(1.02);
+    }
+    label {
+      font-weight: bold;
+      color: #0277bd;
+    }
+    select, input, button {
+      margin: 12px 0;
+      padding: 12px;
+      width: 230px;
+      border-radius: 8px;
+      border: 1px solid #bbb;
+      font-size: 1em;
+    }
+    button {
+      background: #0288d1;
+      color: white;
+      cursor: pointer;
+      border: none;
+      font-weight: bold;
+    }
+    button:hover {
+      background: #01579b;
+    }
+    #station-desc {
+      margin-top: -10px;
+      margin-bottom: 15px;
+      font-size: 0.9em;
+      color: #333;
+      font-style: italic;
+    }
+    #simulateResult {
+      margin-top: 30px;
+      padding: 20px;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: left;
+      display: none;
+    }
+    #simulateResult h2 {
+      color: #d32f2f;
+    }
+    .footer {
+      margin-top: 40px;
+      font-size: 0.9em;
+      color: #444;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="https://img.icons8.com/fluency/96/water.png" alt="Water Logo">
+    <h1>🌍 Smart Water Quality Prediction</h1>
+  </header>
+
+  <!-- Prediction Form -->
+  <form action="/predict" method="POST">
+    <label>Station ID:</label><br>
+    <select id="stationSelect" name="id" required onchange="updateDescription()">
+      {% for station in stations %}
+        <option value="{{ station }}">Station {{ station }}</option>
+      {% endfor %}
+    </select><br>
+    <div id="station-desc">Select a station to see details...</div>
+
+    <label>Year:</label><br>
+    <select name="year" required>
+      {% for y in range(2015, 2031) %}
+        <option value="{{y}}">{{y}}</option>
+      {% endfor %}
+    </select><br>
+
+    <button type="submit">🔎 Predict</button>
+  </form>
+
+  <!-- Live Simulation -->
+  <div style="margin-top:20px;">
+    <button onclick="simulateData()">🎲 Live Simulate Data</button>
+  </div>
+
+  <!-- Simulation Results -->
+  <div id="simulateResult">
+    <h2>📡 Live Simulation Result</h2>
+    <div id="simulateContent">Fetching...</div>
+  </div>
+
+  <div class="footer">
+    🌊 Developed for Smart India Hackathon — Smart Community Health System
+  </div>
+
+  <script>
+    // Station descriptions mapping
+    const stationDescriptions = {
+      "2": "Station 2 — Near industrial discharge zone",
+      "3": "Station 3 — Urban residential water supply",
+      "4": "Station 4 — Rural agricultural area",
+      "5": "Station 5 — River monitoring site"
+    };
+
+    function updateDescription() {
+      const station = document.getElementById("stationSelect").value;
+      const descBox = document.getElementById("station-desc");
+      descBox.innerText = stationDescriptions[station] || "Station details not available.";
+    }
+
+    // Simulation fetch
+    function simulateData() {
+      const resultBox = document.getElementById("simulateResult");
+      const content = document.getElementById("simulateContent");
+      resultBox.style.display = "block";
+      content.innerHTML = "⏳ Fetching live data...";
+
+      fetch("/simulate")
+        .then(res => res.json())
+        .then(data => {
+          content.innerHTML = `
+            <b>Pollutant Levels:</b><br>
+            ${Object.entries(data.simulated_data).map(([k,v]) => `${k}: ${v}`).join("<br>")}
+            <br><br>
+            <b>Risks:</b><br>
+            ${Object.entries(data.risks).map(([k,v]) => `${k}: ${v}`).join("<br>")}
+            <br><br>
+            <b>Most Unsafe:</b> ${data.most_unsafe || "None"}<br>
+            <b>Recommendation:</b> ${data.recommendation}
+          `;
+        })
+        .catch(err => {
+          content.innerHTML = "❌ Error fetching simulation data.";
+        });
+    }
+  </script>
+</body>
+</html>

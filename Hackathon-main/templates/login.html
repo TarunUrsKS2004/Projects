@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login - Smart Water</title>
+  <style>
+    body { font-family: Arial; background: #e3f2fd; text-align:center; }
+    .form-box { background:#fff; padding:30px; margin:100px auto; width:300px; border-radius:10px; box-shadow:0px 4px 10px rgba(0,0,0,0.2); }
+    input, button { width:90%; padding:10px; margin:10px; border-radius:6px; border:1px solid #aaa; }
+    button { background:#0288d1; color:#fff; border:none; cursor:pointer; }
+  </style>
+</head>
+<body>
+  <div class="form-box">
+    <h2>🔑 Login</h2>
+    <form action="/login" method="POST">
+      <input type="text" name="username" placeholder="Username" required><br>
+      <input type="password" name="password" placeholder="Password" required><br>
+      <button type="submit">Login</button>
+    </form>
+    <p>Don't have an account? <a href="/register">Register</a></p>
+  </div>
+</body>
+</html>

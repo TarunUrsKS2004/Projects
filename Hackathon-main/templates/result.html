@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🌊 Water Quality Report</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(to right, #e0f7fa, #e1f5fe);
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    h1 { text-align: center; color: #0277bd; margin-bottom: 20px; }
+    .container { max-width: 900px; margin: auto; }
+    .status { text-align: center; font-size: 1.4em; padding: 12px; border-radius: 8px; margin-bottom: 20px; }
+    .safe { background: #c8e6c9; color: #256029; font-weight: bold; }
+    .unsafe { background: #ffcdd2; color: #b71c1c; font-weight: bold; }
+    .card { background: #fff; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0px 4px 10px rgba(0,0,0,0.1); }
+    .card h2 { margin-top: 0; color: #01579b; border-bottom: 2px solid #e0f2f1; padding-bottom: 5px; }
+    ul, ol { text-align: left; line-height: 1.6em; }
+    li { margin: 6px 0; }
+    .highlight { background: #ffebee; padding: 12px; border-left: 5px solid #d32f2f; border-radius: 6px; font-size: 1.1em; }
+    .recommend-box { background: #e8f5e9; padding: 14px; border-left: 5px solid #2e7d32; border-radius: 6px; font-size: 1.05em; color: #1b5e20; }
+    .footer { text-align: center; margin-top: 30px; color: #555; font-size: 0.9em; }
+    .chart { text-align: center; }
+    .chart img { max-width: 100%; border-radius: 8px; margin-top: 10px; box-shadow: 0px 4px 8px rgba(0,0,0,0.15); }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    {% if error %}
+      <h1>⚠️ Error</h1>
+      <div class="card">
+        <p style="color: red; font-weight: bold;">{{ error }}</p>
+      </div>
+    {% else %}
+
+      <h1>📊 Water Quality Report</h1>
+
+      {% if overall_status %}
+        <div class="status {% if overall_status == 'Safe ✅' %}safe{% else %}unsafe{% endif %}">
+          Status: {{ overall_status }}
+        </div>
+      {% endif %}
+
+      {% if station_id or year %}
+        <div class="card">
+          <h2>🔎 Station Details</h2>
+          {% if station_id %}<p><b>Station ID:</b> {{ station_id }}</p>{% endif %}
+          {% if year %}<p><b>Year:</b> {{ year }}</p>{% endif %}
+        </div>
+      {% endif %}
+
+      {% if pollutants and pollutants|length > 0 %}
+        <div class="card">
+          <h2>💧 Predicted Pollutant Levels</h2>
+          <ul>
+            {% for k,v in pollutants.items() %}
+              <li><b>{{ k }}:</b> {{ v }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% else %}
+        <div class="card">
+          <p>No pollutant data available.</p>
+        </div>
+      {% endif %}
+
+      {% if chart_path %}
+        <div class="card chart">
+          <h2>📊 Pollutant Visualization</h2>
+          <img src="{{ chart_path or '#' }}" alt="Pollutant Chart">
+        </div>
+      {% endif %}
+
+      {% if risk and risk|length > 0 %}
+        <div class="card">
+          <h2>⚠️ Detected Risks</h2>
+          <ul>
+            {% for k,v in risk.items() %}
+              <li><b>{{ k }}:</b> {{ v }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      {% if most_unsafe %}
+        <div class="card">
+          <h2>🔥 Most Unsafe Pollutant</h2>
+          <div class="highlight">
+            <b>{{ most_unsafe }}</b> — {{ risk.get(most_unsafe, "No data") }}
+          </div>
+        </div>
+      {% endif %}
+
+      {% if ranked_risks and ranked_risks|length > 0 %}
+        <div class="card">
+          <h2>📉 Risk Ranking</h2>
+          <ol>
+            {% for pollutant, score in ranked_risks %}
+              <li><b>{{ pollutant }}</b> (Severity: {{ score }}) — {{ risk.get(pollutant, "No data") }}</li>
+            {% endfor %}
+          </ol>
+        </div>
+      {% endif %}
+
+      {% if recommendation %}
+        <div class="card">
+          <h2>💡 Recommendation</h2>
+          <div class="recommend-box">
+            {{ recommendation }}
+          </div>
+        </div>
+      {% endif %}
+
+      {% if precautions and precautions|length > 0 %}
+        <div class="card">
+          <h2>🛡️ Recommended Precautionary Measures</h2>
+          <ul>
+            {% for p in precautions %}
+              <li>{{ p }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+    {% endif %}
+
+    <div class="footer">
+      🌍 Smart Community Health & Early Warning System for Water-Borne Diseases
+    </div>
+  </div>
+</body>
+</html>
